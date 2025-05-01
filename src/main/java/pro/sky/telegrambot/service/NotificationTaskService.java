@@ -1,8 +1,14 @@
 package pro.sky.telegrambot.service;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambot.model.NotificationTask;
 import pro.sky.telegrambot.repository.NotificationTaskRepository;
+
+import javax.management.Notification;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 public class NotificationTaskService {
@@ -16,4 +22,10 @@ public class NotificationTaskService {
     public void addTask(NotificationTask notificationTask) {
             notificationTaskRepository.save(notificationTask);
     }
+
+    public List<NotificationTask> getTaskAtTime() {
+        LocalDateTime currentTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+        return notificationTaskRepository.findNotificationTaskByTimestamp(currentTime);
+    }
+
 }

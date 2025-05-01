@@ -8,13 +8,16 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambot.model.NotificationTask;
 import pro.sky.telegrambot.service.NotificationTaskService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +34,8 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     @Autowired
     private NotificationTaskService notificationTaskService;
+
+    private final Set<Long> chatIds = new HashSet<>();
 
     @PostConstruct
     public void init() {
@@ -50,6 +55,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             if (update.message() != null && update.message().text() != null) {
                 String text = update.message().text();
                 long chatId = update.message().chat().id();
+                chatIds.add(chatId);
 
                 if ("/start".equals(text)) {
                     sendWelcomeMessage(chatId);
@@ -57,6 +63,8 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 if (!text.isBlank()) {
                     processMessage(chatId, text);
                 }
+
+                sendRemind();
             }
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
@@ -81,5 +89,17 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     public void sendResponse(long chatId, String message) {
         SendMessage response = new SendMessage(chatId, message);
         telegramBot.execute(response);
+    }
+
+    @Scheduled(cron = "0 0/1 * * * *")
+    public void sendRemind() {
+        List<NotificationTask> tasks = notificationTaskService.getTaskAtTime();
+
+        for (Long id : chatIds) {
+            for (NotificationTask task : tasks) {
+                String messageText = "Есть запланированные дела: \n " + task.getText();
+                sendResponse(id, messageText);
+            }
+        }
     }
 }
