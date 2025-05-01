@@ -67,7 +67,8 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         Matcher matcher = pattern.matcher(message);
         if (matcher.matches()) {
             NotificationTask task = new NotificationTask();
-            LocalDateTime localDateTime = parse("01.01.2022 20:00", DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
+            String dateTime = matcher.group(1);
+            LocalDateTime localDateTime = parse(dateTime, DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
             task.setTimestamp(localDateTime);
             task.setText(matcher.group(3));
             notificationTaskService.addTask(task);
