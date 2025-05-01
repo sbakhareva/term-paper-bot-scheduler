@@ -63,10 +63,9 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 if (!text.isBlank()) {
                     processMessage(chatId, text);
                 }
-
-                sendRemind();
             }
         });
+        sendRemind();
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
