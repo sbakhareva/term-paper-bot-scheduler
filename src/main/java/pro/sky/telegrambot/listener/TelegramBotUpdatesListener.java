@@ -9,8 +9,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pro.sky.telegrambot.model.NotificationTask;
+import pro.sky.telegrambot.service.NotificationTaskService;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static java.time.LocalDateTime.parse;
+import static java.util.regex.Pattern.compile;
 
 @Service
 public class TelegramBotUpdatesListener implements UpdatesListener {
@@ -19,6 +28,9 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     @Autowired
     private TelegramBot telegramBot;
+
+    @Autowired
+    private NotificationTaskService notificationTaskService;
 
     @PostConstruct
     public void init() {
@@ -42,8 +54,31 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 if ("/start".equals(text)) {
                     sendWelcomeMessage(chatId);
                 }
+                if (!text.isBlank()) {
+                    processMessage(chatId, text);
+                }
             }
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
+    }
+
+    public void processMessage(long chatId, String message) {
+        Pattern pattern = compile("(\\d{2}\\.\\d{2}\\.\\d{4}\\s\\d{2}:\\d{2})(\\s+)(.+)");
+        Matcher matcher = pattern.matcher(message);
+        if (matcher.matches()) {
+            NotificationTask task = new NotificationTask();
+            LocalDateTime localDateTime = parse("01.01.2022 20:00", DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
+            task.setTimestamp(localDateTime);
+            task.setText(matcher.group(3));
+            notificationTaskService.addTask(task);
+            sendResponse(chatId, "Напоминание успешно добавлено!");
+        } else {
+            sendResponse(chatId, "Неверный формат сообщения! Используйте сообщение вида: 01.01.2022 20:00 Сделать домашнюю работу");
+        }
+    }
+
+    public void sendResponse(long chatId, String message) {
+        SendMessage response = new SendMessage(chatId, message);
+        telegramBot.execute(response);
     }
 }

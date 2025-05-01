@@ -1,8 +1,8 @@
 -- liquibase formatted sql
 
 -- changeset sbakhareva:1
-CREATE TABLE messages (
+CREATE TABLE notification_task (
     id BIGSERIAL PRIMARY KEY,
-    time_stamp TIMESTAMP NOT NULL,
-    message_text TEXT NOT NULL
+    timestamp TIMESTAMP NOT NULL,
+    text TEXT NOT NULL
 );

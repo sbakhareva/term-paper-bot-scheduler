@@ -15,8 +15,9 @@ public class TelegramBotConfiguration {
     @Bean
     public TelegramBot telegramBot() {
         TelegramBot bot = new TelegramBot(token);
+//        DeleteWebhook deleteWebhook = new DeleteWebhook();
+//        bot.execute(deleteWebhook);
         bot.execute(new DeleteMyCommands());
         return bot;
     }
-
 }
