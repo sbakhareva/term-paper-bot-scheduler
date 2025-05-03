@@ -98,6 +98,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             for (NotificationTask task : tasks) {
                 String messageText = "Есть запланированные дела: \n " + task.getText();
                 sendResponse(id, messageText);
+                notificationTaskService.deleteTask(task);
             }
         }
     }

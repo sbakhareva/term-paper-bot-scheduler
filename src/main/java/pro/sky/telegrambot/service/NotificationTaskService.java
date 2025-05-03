@@ -26,4 +26,8 @@ public class NotificationTaskService {
         return notificationTaskRepository.findNotificationTaskByTimestamp(currentTime);
     }
 
+    public void deleteTask(NotificationTask task) {
+        notificationTaskRepository.delete(task);
+    }
+
 }
