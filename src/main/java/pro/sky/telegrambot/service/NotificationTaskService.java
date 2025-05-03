@@ -4,9 +4,11 @@ import org.springframework.stereotype.Service;
 import pro.sky.telegrambot.model.NotificationTask;
 import pro.sky.telegrambot.repository.NotificationTaskRepository;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class NotificationTaskService {
@@ -30,4 +32,12 @@ public class NotificationTaskService {
         notificationTaskRepository.delete(task);
     }
 
+    public String loadMessage(String name) {
+        try {
+            var is = ClassLoader.getSystemResourceAsStream("messages/" + name + ".txt");
+            return new String(Objects.requireNonNull(is).readAllBytes());
+        } catch (IOException e) {
+            throw new RuntimeException("Can't load message!");
+        }
+    }
 }

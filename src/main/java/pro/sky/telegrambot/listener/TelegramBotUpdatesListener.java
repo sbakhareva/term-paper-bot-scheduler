@@ -43,7 +43,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     }
 
     private void sendWelcomeMessage(long chatId) {
-        String welcomeText = "Привет!";
+        String welcomeText = notificationTaskService.loadMessage("main");
         SendMessage request = new SendMessage(chatId, welcomeText);
         telegramBot.execute(request);
     }
@@ -59,6 +59,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
                 if ("/start".equals(text)) {
                     sendWelcomeMessage(chatId);
+                    return;
                 }
                 if (!text.isBlank()) {
                     processMessage(chatId, text);
