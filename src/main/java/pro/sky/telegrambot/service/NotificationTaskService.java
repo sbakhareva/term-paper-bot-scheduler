@@ -1,5 +1,7 @@
 package pro.sky.telegrambot.service;
 
+import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.request.SendPhoto;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambot.model.NotificationTask;
 import pro.sky.telegrambot.repository.NotificationTaskRepository;

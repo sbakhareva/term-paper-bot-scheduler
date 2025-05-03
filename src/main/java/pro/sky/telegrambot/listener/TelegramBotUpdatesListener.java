@@ -4,6 +4,7 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SendPhoto;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import pro.sky.telegrambot.model.NotificationTask;
 import pro.sky.telegrambot.service.NotificationTaskService;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
@@ -43,9 +45,16 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     }
 
     private void sendWelcomeMessage(long chatId) {
-        String welcomeText = notificationTaskService.loadMessage("main");
+        String welcomeText = notificationTaskService.loadMessage("welcome_message");
         SendMessage request = new SendMessage(chatId, welcomeText);
         telegramBot.execute(request);
+    }
+
+    private void sendWelcomePhoto(long chatId) {
+        String imagePath = "src/main/resources/images/welcome_image.jpeg";
+        File photo = new File(imagePath);
+        SendPhoto sendPhoto = new SendPhoto(chatId, photo);
+        telegramBot.execute(sendPhoto);
     }
 
     @Override
@@ -59,6 +68,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
                 if ("/start".equals(text)) {
                     sendWelcomeMessage(chatId);
+                    sendWelcomePhoto(chatId);
                     return;
                 }
                 if (!text.isBlank()) {
