@@ -15,10 +15,12 @@ import pro.sky.telegrambot.model.NotificationTask;
 import pro.sky.telegrambot.service.NotificationTaskService;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,19 +46,6 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         telegramBot.setUpdatesListener(this);
     }
 
-    private void sendWelcomeMessage(long chatId) {
-        String welcomeText = notificationTaskService.loadMessage("welcome_message");
-        SendMessage request = new SendMessage(chatId, welcomeText);
-        telegramBot.execute(request);
-    }
-
-    private void sendWelcomePhoto(long chatId) {
-        String imagePath = "src/main/resources/images/welcome_image.jpeg";
-        File photo = new File(imagePath);
-        SendPhoto sendPhoto = new SendPhoto(chatId, photo);
-        telegramBot.execute(sendPhoto);
-    }
-
     @Override
     public int process(List<Update> updates) {
         updates.forEach(update -> {
@@ -69,15 +58,38 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 if ("/start".equals(text)) {
                     sendWelcomeMessage(chatId);
                     sendWelcomePhoto(chatId);
-                    return;
-                }
-                if (!text.isBlank()) {
-                    processMessage(chatId, text);
-                }
+                } else if ("/add_task".equals(text)) {
+                    addTaskMessage(chatId);
+                } else processMessage(chatId, text);
             }
         });
         sendRemind();
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
+    }
+
+
+    private void sendWelcomeMessage(long chatId) {
+        try {
+            var is = ClassLoader.getSystemResourceAsStream("messages/welcome_message.txt");
+            String welcomeMessage = new String(Objects.requireNonNull(is).readAllBytes());
+            SendMessage request = new SendMessage(chatId, welcomeMessage);
+            telegramBot.execute(request);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void addTaskMessage(long chatId) {
+        String addTaskMessage = "Напишите, какое напоминание вы хотите добавить, в формате '03.05.2025 17:28 Заняться делами!'";
+        SendMessage sendMessage = new SendMessage(chatId, addTaskMessage);
+        telegramBot.execute(sendMessage);
+    }
+
+    private void sendWelcomePhoto(long chatId) {
+        String imagePath = "src/main/resources/images/welcome_image.jpeg";
+        File photo = new File(imagePath);
+        SendPhoto sendPhoto = new SendPhoto(chatId, photo);
+        telegramBot.execute(sendPhoto);
     }
 
     public void processMessage(long chatId, String message) {
