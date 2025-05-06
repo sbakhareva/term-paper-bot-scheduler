@@ -15,13 +15,15 @@ public class NotificationTask {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long chatId;
+
     private LocalDateTime timestamp;
     private String text;
 
     public NotificationTask() {
     }
 
-    public NotificationTask(LocalDateTime dateNtime, String text) {
+    public NotificationTask(LocalDateTime dateNtime, String text, Long chatId) {
         this.timestamp = dateNtime;
         this.text = text;
     }
@@ -32,6 +34,15 @@ public class NotificationTask {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+
+    public long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(long chatId) {
+        this.chatId = chatId;
     }
 
     public LocalDateTime getTimestamp() {
