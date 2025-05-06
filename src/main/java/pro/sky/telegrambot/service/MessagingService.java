@@ -4,16 +4,15 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambot.model.NotificationTask;
+import pro.sky.telegrambot.utils.FileReaderUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -31,16 +30,18 @@ public class MessagingService {
     @Autowired
     private TelegramBot telegramBot;
 
+    @Autowired
+    private FileReaderUtil fileReaderUtil;
+
     private final Set<Long> chatIds = new HashSet<>();
 
     public void sendWelcomeMessage(long chatId) {
         try {
-            var is = ClassLoader.getSystemResourceAsStream("messages/welcome_message.txt");
-            String welcomeMessage = new String(Objects.requireNonNull(is).readAllBytes());
-            SendMessage request = new SendMessage(chatId, welcomeMessage);
+            var is = fileReaderUtil.readFile("messages/welcome_message.txt");
+            SendMessage request = new SendMessage(chatId, is);
             telegramBot.execute(request);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Файла по такому пути нет!");
         }
     }
 
