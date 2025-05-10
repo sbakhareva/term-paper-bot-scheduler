@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import pro.sky.telegrambot.model.NotificationTask;
 import pro.sky.telegrambot.service.MessagingService;
 import pro.sky.telegrambot.service.NotificationTaskService;
+import pro.sky.telegrambot.service.Scheduler;
 
 import java.util.HashSet;
 import java.util.List;
@@ -22,14 +23,22 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
 
-    @Autowired
-    private TelegramBot telegramBot;
-    @Autowired
-    private NotificationTaskService notificationTaskService;
-    @Autowired
-    private MessagingService messagingService;
+    private final TelegramBot telegramBot;
+    private final NotificationTaskService notificationTaskService;
+    private final MessagingService messagingService;
+    private final Scheduler scheduler;
 
     private final Set<Long> chatIds = new HashSet<>();
+
+    public TelegramBotUpdatesListener(TelegramBot telegramBot,
+                                      NotificationTaskService notificationTaskService,
+                                      MessagingService messagingService,
+                                      Scheduler scheduler) {
+        this.telegramBot = telegramBot;
+        this.notificationTaskService = notificationTaskService;
+        this.messagingService = messagingService;
+        this.scheduler = scheduler;
+    }
 
     @PostConstruct
     public void init() {
@@ -57,17 +66,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     }
 
     @Scheduled(cron = "0 0/1 * * * *")
-    public void sendRemind() {
-        List<NotificationTask> tasks = notificationTaskService.getTaskAtTime();
-
-        for (Long id : chatIds) {
-            for (NotificationTask task : tasks) {
-                if (id.equals(task.getChatId())) {
-                    String messageText = "Есть запланированные дела: \n " + task.getText();
-                    messagingService.sendResponse(id, messageText);
-                    notificationTaskService.deleteTask(task);
-                }
-            }
-        }
+    public void sendRemindAtTime() {
+        scheduler.sendRemind(chatIds);
     }
 }

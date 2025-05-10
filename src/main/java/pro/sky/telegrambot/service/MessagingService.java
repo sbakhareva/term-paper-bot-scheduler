@@ -25,16 +25,19 @@ import static java.util.regex.Pattern.compile;
 @Service
 public class MessagingService {
 
-    @Autowired
-    private NotificationTaskService notificationTaskService;
-
-    @Autowired
-    private TelegramBot telegramBot;
-
-    @Autowired
-    private FileReaderUtil fileReaderUtil;
+    private final NotificationTaskService notificationTaskService;
+    private final TelegramBot telegramBot;
+    private final FileReaderUtil fileReaderUtil;
 
     private final Set<Long> chatIds = new HashSet<>();
+
+    public MessagingService(NotificationTaskService notificationTaskService,
+                            TelegramBot telegramBot,
+                            FileReaderUtil fileReaderUtil) {
+        this.notificationTaskService = notificationTaskService;
+        this.telegramBot = telegramBot;
+        this.fileReaderUtil = fileReaderUtil;
+    }
 
     public void sendWelcomeMessage(long chatId) {
         try {
