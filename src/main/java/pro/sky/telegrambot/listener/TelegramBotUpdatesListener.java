@@ -56,7 +56,6 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
-
     @Scheduled(cron = "0 0/1 * * * *")
     public void sendRemind() {
         List<NotificationTask> tasks = notificationTaskService.getTaskAtTime();
