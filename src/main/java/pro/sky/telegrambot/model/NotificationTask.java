@@ -16,17 +16,8 @@ public class NotificationTask {
     private Long id;
 
     private Long chatId;
-
     private LocalDateTime timestamp;
     private String text;
-
-    public NotificationTask() {
-    }
-
-    public NotificationTask(LocalDateTime dateNtime, String text, Long chatId) {
-        this.timestamp = dateNtime;
-        this.text = text;
-    }
 
     public Long getId() {
         return id;
@@ -36,12 +27,11 @@ public class NotificationTask {
         this.id = id;
     }
 
-
-    public long getChatId() {
+    public Long getChatId() {
         return chatId;
     }
 
-    public void setChatId(long chatId) {
+    public void setChatId(Long chatId) {
         this.chatId = chatId;
     }
 
