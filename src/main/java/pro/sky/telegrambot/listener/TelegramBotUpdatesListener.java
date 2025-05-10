@@ -49,7 +49,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                     messagingService.sendWelcomeMessage(chatId);
                     messagingService.sendWelcomePhoto(chatId);
                 } else if ("/add_task".equals(text)) {
-                    messagingService.addTaskMessage(chatId);
+                    messagingService.sendAddTaskMessage(chatId);
                 } else messagingService.processMessage(chatId, text);
             }
         });

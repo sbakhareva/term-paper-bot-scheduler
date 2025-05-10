@@ -9,6 +9,7 @@ import pro.sky.telegrambot.model.NotificationTask;
 import pro.sky.telegrambot.utils.FileReaderUtil;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -45,7 +46,7 @@ public class MessagingService {
         }
     }
 
-    public void addTaskMessage(long chatId) {
+    public void sendAddTaskMessage(long chatId) {
         String addTaskMessage = "Напишите, какое напоминание вы хотите добавить, в формате '03.05.2025 17:28 Заняться делами!'";
         SendMessage sendMessage = new SendMessage(chatId, addTaskMessage);
         telegramBot.execute(sendMessage);
