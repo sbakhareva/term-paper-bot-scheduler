@@ -6,17 +6,12 @@ import com.pengrad.telegrambot.model.Update;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import pro.sky.telegrambot.model.NotificationTask;
 import pro.sky.telegrambot.service.MessagingService;
 import pro.sky.telegrambot.service.NotificationTaskService;
 import pro.sky.telegrambot.service.Scheduler;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class TelegramBotUpdatesListener implements UpdatesListener {
@@ -27,8 +22,6 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private final NotificationTaskService notificationTaskService;
     private final MessagingService messagingService;
     private final Scheduler scheduler;
-
-    private final Set<Long> chatIds = new HashSet<>();
 
     public TelegramBotUpdatesListener(TelegramBot telegramBot,
                                       NotificationTaskService notificationTaskService,
@@ -52,7 +45,6 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             if (update.message() != null && update.message().text() != null) {
                 String text = update.message().text();
                 long chatId = update.message().chat().id();
-                chatIds.add(chatId);
 
                 if ("/start".equals(text)) {
                     messagingService.sendWelcomeMessage(chatId);
@@ -63,10 +55,5 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             }
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
-    }
-
-    @Scheduled(cron = "0 0/1 * * * *")
-    public void sendRemindAtTime() {
-        scheduler.sendRemind(chatIds);
     }
 }

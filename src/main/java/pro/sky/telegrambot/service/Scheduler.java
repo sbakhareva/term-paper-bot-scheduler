@@ -1,13 +1,12 @@
 package pro.sky.telegrambot.service;
 
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import pro.sky.telegrambot.model.NotificationTask;
 
 import java.util.List;
-import java.util.Set;
 
-@Service
+@Component
 public class Scheduler {
 
     private final NotificationTaskService notificationTaskService;
@@ -18,17 +17,14 @@ public class Scheduler {
         this.messagingService = messagingService;
     }
 
-    public void sendRemind(Set<Long> chatIds) {
+    @Scheduled(cron = "0 0/1 * * * *")
+    public void sendRemind() {
         List<NotificationTask> tasks = notificationTaskService.getTaskAtTime();
 
-        for (Long id : chatIds) {
-            for (NotificationTask task : tasks) {
-                if (id.equals(task.getChatId())) {
-                    String messageText = "Есть запланированные дела: \n " + task.getText();
-                    messagingService.sendResponse(id, messageText);
-                    notificationTaskService.deleteTask(task);
-                }
-            }
+        for (NotificationTask task : tasks) {
+            String messageText = "Есть запланированные дела: \n " + task.getText();
+            messagingService.sendResponse(task.getChatId(), messageText);
+            notificationTaskService.deleteTask(task);
         }
     }
 }
