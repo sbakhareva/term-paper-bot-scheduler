@@ -29,8 +29,6 @@ public class MessagingService {
     private final TelegramBot telegramBot;
     private final FileReaderUtil fileReaderUtil;
 
-    private final Set<Long> chatIds = new HashSet<>();
-
     public MessagingService(NotificationTaskService notificationTaskService,
                             TelegramBot telegramBot,
                             FileReaderUtil fileReaderUtil) {
